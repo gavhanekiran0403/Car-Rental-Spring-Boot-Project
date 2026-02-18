@@ -1,17 +1,12 @@
-package com.crms.entities;
-
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+package com.crms.dto;
 
 import com.crms.enums.Role;
 
 import lombok.Data;
 
 @Data
-@Document(collation = "users")
-public class User {
+public class UserDto {
 
-	@Id
 	private String userId;
     private String fullName;
     private String phoneNo;
