@@ -18,31 +18,31 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
-@RequestMapping("/users/")
+@RequestMapping("/users")
 public class UserController {
 
 	@Autowired
 	private UserService userService;
 	
-	@PostMapping("register")
+	@PostMapping("/register")
 	public ResponseEntity<UserDto> registerUser(@RequestBody UserDto userDto) {
 		UserDto registeredUser = userService.registerUser(userDto);
 		return new ResponseEntity<UserDto>(registeredUser, HttpStatus.CREATED);
 	}
 	
-	@PutMapping("update/{UserId}")
+	@PutMapping("/update/{UserId}")
 	public ResponseEntity<UserDto> updateUser(@PathVariable String userId, @RequestBody UserDto userDto) {
 		UserDto updatedUser = userService.updateUser(userId, userDto);
 		return new ResponseEntity<UserDto>(updatedUser, HttpStatus.OK);
 	}
 	
-	@GetMapping("{userId}")
+	@GetMapping("/{userId}")
 	public ResponseEntity<UserDto> getMethodName(@PathVariable String userId) {
 		UserDto userDto = userService.getUserById(userId);
 		return new ResponseEntity<UserDto>(userDto, HttpStatus.OK);
 	}
 	
-	@GetMapping
+	@GetMapping("/")
 	public ResponseEntity<List<UserDto>> getAllUsers() {
 		List<UserDto> userDtos = userService.getAllUsers();
 		return new ResponseEntity<List<UserDto>>(userDtos, HttpStatus.OK);
