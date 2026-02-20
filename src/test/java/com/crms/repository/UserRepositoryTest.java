@@ -2,6 +2,9 @@ package com.crms.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,5 +35,24 @@ public class UserRepositoryTest {
 		assertNotNull(savedUser);
 		assertNotNull(savedUser.getUserId());
 		assertEquals("Kiran Gavhane", savedUser.getFullName());
+	}
+	
+	@Test
+	void testFindUserById() {
+		
+		User user = new User();
+		user.setFullName("Kiran Gavhane");
+		user.setPhoneNo("9049226199");
+		user.setEmail("gavhanekiran0403@gmail.com");
+		user.setPassword("kiran@123");
+		user.setRole(Role.USER);
+		user.setStatus(false);
+		
+		User savedUser = userRepository.save(user);
+		
+		Optional<User> foundUser = userRepository.findById(savedUser.getUserId());
+		
+		assertTrue(foundUser.isPresent());
+		assertEquals("Kiran", foundUser.get().getFullName());
 	}
 }
