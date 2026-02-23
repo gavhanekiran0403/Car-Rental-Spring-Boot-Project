@@ -30,19 +30,19 @@ public class UserController {
 		return new ResponseEntity<UserDto>(registeredUser, HttpStatus.CREATED);
 	}
 	
-	@PutMapping("/update/{UserId}")
+	@PutMapping("/update/{userId}")
 	public ResponseEntity<UserDto> updateUser(@PathVariable String userId, @RequestBody UserDto userDto) {
 		UserDto updatedUser = userService.updateUser(userId, userDto);
 		return new ResponseEntity<UserDto>(updatedUser, HttpStatus.OK);
 	}
 	
 	@GetMapping("/{userId}")
-	public ResponseEntity<UserDto> getMethodName(@PathVariable String userId) {
+	public ResponseEntity<UserDto> getUserById(@PathVariable String userId) {
 		UserDto userDto = userService.getUserById(userId);
 		return new ResponseEntity<UserDto>(userDto, HttpStatus.OK);
 	}
 	
-	@GetMapping("/")
+	@GetMapping
 	public ResponseEntity<List<UserDto>> getAllUsers() {
 		List<UserDto> userDtos = userService.getAllUsers();
 		return new ResponseEntity<List<UserDto>>(userDtos, HttpStatus.OK);
