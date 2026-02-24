@@ -7,8 +7,8 @@ import com.crms.enums.Role;
 
 import lombok.Data;
 
-@Data
 @Document(collection = "users")
+@Data
 public class User {
 
 	@Id
