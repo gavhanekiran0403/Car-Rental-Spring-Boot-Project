@@ -14,7 +14,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import com.crms.dto.ApiResponse;
+import com.crms.payload.ApiResponse;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
