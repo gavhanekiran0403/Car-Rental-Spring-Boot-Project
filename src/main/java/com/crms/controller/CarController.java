@@ -13,7 +13,7 @@ import com.crms.dto.CarDto;
 import com.crms.service.CarService;
 
 @RestController
-@RequestMapping("/api/cars")
+@RequestMapping("/cars")
 public class CarController {
 
     @Autowired

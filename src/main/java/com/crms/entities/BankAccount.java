@@ -10,8 +10,8 @@ import lombok.Data;
 public class BankAccount {
 
 	@Id
-	private String bankAccId;
-	private String accHolderName;
+	private String bankAccountId;
+	private String accountHolderName;
 	private String bankName;
 	private String accountNo;
 	private String ifscNo;

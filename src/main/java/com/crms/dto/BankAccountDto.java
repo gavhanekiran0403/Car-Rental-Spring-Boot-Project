@@ -5,8 +5,8 @@ import lombok.Data;
 @Data
 public class BankAccountDto {
 
-	private String bankAccId;
-	private String accHolderName;
+	private String bankAccountId;
+	private String accountHolderName;
 	private String bankName;
 	private String accountNo;
 	private String ifscNo;
