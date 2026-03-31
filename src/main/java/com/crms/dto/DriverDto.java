@@ -12,5 +12,5 @@ public class DriverDto {
 	private String email;
 	private String address;
 	private String status;
-	private String bankAccId;
+	private String bankAccountId;
 }

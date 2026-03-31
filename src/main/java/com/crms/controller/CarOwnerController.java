@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.crms.dto.CarOwnerDto;
 import com.crms.service.CarOwnerService;
@@ -15,9 +16,12 @@ public class CarOwnerController {
     @Autowired
     private CarOwnerService service;
 
-    @PostMapping
-    public CarOwnerDto createOwner(@RequestBody CarOwnerDto dto) {
-        return service.createCarOwner(dto);
+    @PostMapping(consumes = "multipart/form-data")
+    public CarOwnerDto createOwner(
+            @RequestPart("carOwner") CarOwnerDto carOwnerDto,
+            @RequestPart("image") MultipartFile imageFile) {
+
+        return service.createCarOwner(carOwnerDto, imageFile);
     }
 
     @GetMapping("/{id}")
@@ -30,10 +34,13 @@ public class CarOwnerController {
         return service.getAllCarOwners();
     }
 
-    @PutMapping("/{id}")
-    public CarOwnerDto updateOwner(@PathVariable String id,
-                                   @RequestBody CarOwnerDto dto) {
-        return service.updateCarOwner(id, dto);
+    @PutMapping(value = "/{id}", consumes = "multipart/form-data")
+    public CarOwnerDto updateOwner(
+            @PathVariable String id,
+            @RequestPart("carOwner") CarOwnerDto carOwnerDto,
+            @RequestPart(value = "image", required = false) MultipartFile imageFile) {
+
+        return service.updateCarOwner(id, carOwnerDto, imageFile);
     }
 
     @DeleteMapping("/{id}")

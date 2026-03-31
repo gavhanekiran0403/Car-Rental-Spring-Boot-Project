@@ -10,6 +10,6 @@ public class CarOwnerDto {
 	private String phoneNo;
 	private String email;
 	private String address;
-	private byte[] aadharImage;
-	private String bankAccId;
+	private String aadharImage;
+	private String bankAccountId;
 }

@@ -23,6 +23,7 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public DriverDto createDriver(DriverDto dto) {
         Driver driver = mapper.dtoToEntity(dto);
+        driver.setStatus("Available");
         Driver saved = repository.save(driver);
         return mapper.entityToDto(saved);
     }
@@ -53,7 +54,7 @@ public class DriverServiceImpl implements DriverService {
         existing.setEmail(dto.getEmail());
         existing.setAddress(dto.getAddress());
         existing.setStatus(dto.getStatus());
-        existing.setBankAccId(dto.getBankAccId());
+        existing.setBankAccountId(dto.getBankAccountId());
 
         Driver updated = repository.save(existing);
         return mapper.entityToDto(updated);
