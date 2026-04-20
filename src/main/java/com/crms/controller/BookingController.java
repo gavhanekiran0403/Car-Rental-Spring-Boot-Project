@@ -9,7 +9,7 @@ import com.crms.dto.BookingDto;
 import com.crms.service.BookingService;
 
 @RestController
-@RequestMapping("/api/bookings")
+@RequestMapping("/bookings")
 public class BookingController {
 
     @Autowired

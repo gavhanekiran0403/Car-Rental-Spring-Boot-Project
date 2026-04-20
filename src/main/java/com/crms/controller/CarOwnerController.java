@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.crms.dto.CarOwnerBankDto;
 import com.crms.dto.CarOwnerDto;
 import com.crms.service.CarOwnerService;
 
@@ -47,5 +48,13 @@ public class CarOwnerController {
     public String deleteOwner(@PathVariable String id) {
         service.deleteCarOwner(id);
         return "Deleted successfully";
+    }
+    
+    @PostMapping(value = "/car-owner-with-bank", consumes = "multipart/form-data")
+    public CarOwnerBankDto createOwnerWithBankAccount(
+            @RequestPart("carOwner") CarOwnerBankDto carOwnerBankDto,
+            @RequestPart("image") MultipartFile imageFile) {
+
+        return service.createCarOwnerBank(carOwnerBankDto, imageFile);
     }
 }

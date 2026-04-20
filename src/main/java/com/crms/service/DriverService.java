@@ -2,6 +2,7 @@ package com.crms.service;
 
 import java.util.List;
 
+import com.crms.dto.DriverBankDto;
 import com.crms.dto.DriverDto;
 
 public interface DriverService {
@@ -15,4 +16,6 @@ public interface DriverService {
     DriverDto updateDriver(String driverId, DriverDto driverDto);
 
     void deleteDriver(String driverId);
+    
+    DriverBankDto createDriverWithBankAccount(DriverBankDto driverBankDto);
 }

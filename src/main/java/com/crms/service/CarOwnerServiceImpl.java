@@ -7,9 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.crms.dto.CarOwnerBankDto;
 import com.crms.dto.CarOwnerDto;
+import com.crms.entities.BankAccount;
 import com.crms.entities.CarOwner;
 import com.crms.mapper.CarOwnerMapper;
+import com.crms.repository.BankAccountRepository;
 import com.crms.repository.CarOwnerRepository;
 
 @Service
@@ -18,6 +21,9 @@ public class CarOwnerServiceImpl implements CarOwnerService {
     @Autowired
     private CarOwnerRepository repository;
 
+    @Autowired
+    private BankAccountRepository bankAccountRepository;
+    
     @Autowired
     private CarOwnerMapper mapper;
 
@@ -99,4 +105,39 @@ public class CarOwnerServiceImpl implements CarOwnerService {
 
         repository.deleteById(ownerId);
     }
+
+	@Override
+	public CarOwnerBankDto createCarOwnerBank(CarOwnerBankDto carOwnerBankDto, MultipartFile imageFile) {
+		
+		try {
+            String fileName = fileService.saveImage(imageFile);
+            carOwnerBankDto.setAadharImage(fileName);
+        } catch (Exception e) {
+            throw new RuntimeException("Image upload failed");
+        }
+		
+		BankAccount bankAccount = new BankAccount();
+		bankAccount.setAccountHolderName(carOwnerBankDto.getOwnerName());
+		bankAccount.setBankName(carOwnerBankDto.getBankName());
+		bankAccount.setAccountNo(carOwnerBankDto.getAccountNo());
+		bankAccount.setIfscNo(carOwnerBankDto.getIfscNo());
+		
+		BankAccount savedBankAccount = bankAccountRepository.save(bankAccount);
+		
+		CarOwner carOwner = new CarOwner();
+		carOwner.setOwnerName(carOwnerBankDto.getOwnerName());
+		carOwner.setPhoneNo(carOwnerBankDto.getPhoneNo());
+		carOwner.setEmail(carOwnerBankDto.getEmail());
+		carOwner.setAddress(carOwnerBankDto.getAddress());
+		carOwner.setAadharImage(carOwnerBankDto.getAadharImage());
+		carOwner.setBankAccountId(savedBankAccount.getBankAccountId());
+		
+		CarOwner saved = repository.save(carOwner);
+		
+		carOwnerBankDto.setOwnerId(saved.getOwnerId());
+		carOwnerBankDto.setBankAccountId(savedBankAccount.getBankAccountId());
+		carOwnerBankDto.setAccountHolderName(savedBankAccount.getAccountHolderName());
+		
+		return carOwnerBankDto;
+	}
 }

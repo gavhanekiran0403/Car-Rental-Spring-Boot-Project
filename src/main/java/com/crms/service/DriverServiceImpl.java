@@ -6,9 +6,12 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.crms.dto.DriverBankDto;
 import com.crms.dto.DriverDto;
+import com.crms.entities.BankAccount;
 import com.crms.entities.Driver;
 import com.crms.mapper.DriverMapper;
+import com.crms.repository.BankAccountRepository;
 import com.crms.repository.DriverRepository;
 
 @Service
@@ -16,6 +19,9 @@ public class DriverServiceImpl implements DriverService {
 
     @Autowired
     private DriverRepository repository;
+    
+    @Autowired
+    private BankAccountRepository bankAccountRepository;
 
     @Autowired
     private DriverMapper mapper;
@@ -64,4 +70,33 @@ public class DriverServiceImpl implements DriverService {
     public void deleteDriver(String driverId) {
         repository.deleteById(driverId);
     }
+
+	@Override
+	public DriverBankDto createDriverWithBankAccount(DriverBankDto driverBankDto) {
+		
+		BankAccount bankAccount = new BankAccount();
+		bankAccount.setAccountHolderName(driverBankDto.getFullName());
+		bankAccount.setBankName(driverBankDto.getBankName());
+		bankAccount.setAccountNo(driverBankDto.getAccountNo());
+		bankAccount.setIfscNo(driverBankDto.getIfscNo());
+		
+		BankAccount savedBankAccount = bankAccountRepository.save(bankAccount);
+		
+		Driver driver = new Driver();
+		driver.setFullName(driverBankDto.getFullName());
+		driver.setLicenseNo(driverBankDto.getLicenseNo());
+		driver.setPhoneNo(driverBankDto.getPhoneNo());
+		driver.setEmail(driverBankDto.getEmail());
+		driver.setAddress(driverBankDto.getAddress());
+        driver.setStatus("Available");
+        driver.setBankAccountId(savedBankAccount.getBankAccountId());
+        
+        Driver saved = repository.save(driver);
+        
+        driverBankDto.setDriverId(saved.getDriverId());
+        driverBankDto.setAccountHolderName(driver.getFullName());
+        driverBankDto.setBankAccountId(savedBankAccount.getBankAccountId());
+        
+		return driverBankDto;
+	}
 }

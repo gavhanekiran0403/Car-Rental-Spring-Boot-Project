@@ -20,4 +20,5 @@ public class DriverMapper {
     public DriverDto entityToDto(Driver entity) {
         return modelMapper.map(entity, DriverDto.class);
     }
+    
 }
