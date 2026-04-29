@@ -8,17 +8,17 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ApiResponse<T> {
+public class ErrorResponse {
 
     private String message;
+    private int statusCode;
     private boolean success;
-    private T data;
     private LocalDateTime timestamp;
 
-    public ApiResponse(String message, boolean success, T data) {
+    public ErrorResponse(String message, int statusCode) {
         this.message = message;
-        this.success = success;
-        this.data = data;
+        this.statusCode = statusCode;
+        this.success = false;
         this.timestamp = LocalDateTime.now();
     }
 }

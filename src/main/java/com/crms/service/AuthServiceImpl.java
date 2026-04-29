@@ -15,57 +15,88 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     private UserRepository userRepository;
-    
+
     @Override
-    public ApiResponse login(LoginDto loginDto) {
-        
-        User user = userRepository.findByEmailOrPhoneNo(loginDto.getUsername())
+    public ApiResponse<Object> login(LoginDto loginDto) {
+
+        User user = userRepository
+                .findByEmailOrPhoneNo(loginDto.getUsername())
                 .orElseThrow(() ->
-                    new ResourceNotFoundException(
-                        "User not found with email or phone: " + loginDto.getUsername()
-                    )
+                        new ResourceNotFoundException(
+                                "User not found with email or phone: "
+                                        + loginDto.getUsername()
+                        )
                 );
-        
+
+        // Password check
         if (!user.getPassword().equals(loginDto.getPassword())) {
-            return new ApiResponse("Invalid password", false);
+            return new ApiResponse<>(
+                    "Invalid password",
+                    false,
+                    null
+            );
         }
-        
+
+        // USER already logged in
         if (user.getRole() == Role.USER && user.isStatus()) {
-            return new ApiResponse("User already logged in on another device", false);
+            return new ApiResponse<>(
+                    "User already logged in on another device",
+                    false,
+                    null
+            );
         }
-        
+
+        // Update login status only for USER
         if (user.getRole() == Role.USER) {
             user.setStatus(true);
             userRepository.save(user);
         }
-        
-        // role-based response
-        if (user.getRole() == Role.ADMIN) {
-            return new ApiResponse("Admin login successful", true);
+
+        // Role based response
+        switch (user.getRole()) {
+
+            case ADMIN:
+                return new ApiResponse<>(
+                        "Admin login successful",
+                        true,
+                        user
+                );
+
+            case USER:
+                return new ApiResponse<>(
+                        "User login successful",
+                        true,
+                        user
+                );
+
+            default:
+                return new ApiResponse<>(
+                        "Login successful",
+                        true,
+                        user
+                );
         }
-        
-        if (user.getRole() == Role.USER) {
-            return new ApiResponse("User login successful", true);
-        }
-        
-        return new ApiResponse("Login successful", true);
     }
 
-    
     @Override
-    public void logout(String userId) {
-        
+    public ApiResponse<Object> logout(String userId) {
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->
-                    new ResourceNotFoundException(
-                        "User not found with userId: " + userId
-                    )
+                        new ResourceNotFoundException(
+                                "User not found with userId: " + userId
+                        )
                 );
-        
+
         if (user.getRole() == Role.USER) {
             user.setStatus(false);
             userRepository.save(user);
         }
-    }
 
+        return new ApiResponse<>(
+                "Logout successful",
+                true,
+                null
+        );
+    }
 }

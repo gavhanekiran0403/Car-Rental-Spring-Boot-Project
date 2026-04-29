@@ -1,6 +1,6 @@
 package com.crms.entities;
 
-import java.sql.Timestamp;
+import java.util.Date;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -20,10 +20,10 @@ public class Booking {
 	private String returnDate;
 	private String returnTime;
 	private String drivingOption;
-	private byte[] aadharCard;
+	private String aadharCard;
 	private double totalAmount;
 	private String status;
-	private Timestamp createdAt;
+	private Date createdAt;
 	private String userId;
 	private String carId;
 	private String driverId;

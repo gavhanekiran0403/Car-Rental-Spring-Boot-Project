@@ -1,6 +1,6 @@
 package com.crms.dto;
 
-import java.sql.Timestamp;
+import java.util.Date;
 
 import lombok.Data;
 
@@ -15,10 +15,10 @@ public class BookingDto {
 	private String returnDate;
 	private String returnTime;
 	private String drivingOption;
-	private byte[] aadharCard;
+	private String aadharCard;
 	private double totalAmount;
 	private String status;
-	private Timestamp createdAt;
+	private Date createdAt;
 	private String userId;
 	private String carId;
 	private String driverId;

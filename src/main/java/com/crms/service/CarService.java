@@ -27,5 +27,7 @@ public interface CarService {
 	
 	List<CarDto> searchByStatus(String status);
 
-	void uploadImage(String carId, MultipartFile file) throws IOException;
+	void uploadImage(String carId, List<MultipartFile> imageFiles) throws IOException;
+	
+	void updateCarImages(String carId, List<MultipartFile> imageFiles);
 }

@@ -1,6 +1,6 @@
 package com.crms.dto;
 
-import java.sql.Timestamp;
+import java.util.Date;
 
 import lombok.Data;
 
@@ -10,7 +10,7 @@ public class NotificationDto {
 	private String notificationId;
     private String message;
     private String isRead; 
-    private Timestamp createdAt;
+    private Date createdAt;
     private String userId;
     private String bookingId;
 }

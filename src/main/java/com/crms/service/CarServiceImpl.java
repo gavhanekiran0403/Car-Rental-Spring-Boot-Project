@@ -39,13 +39,14 @@ public class CarServiceImpl implements CarService {
 
         Car savedCar = carRepository.save(car);
         
+        CarDto savedCarDto = carMapper.entityToDto(savedCar);
      // fetch owner
         CarOwner carOwner = carOwnerRepository.findById(car.getOwnerId())
                 .orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
 
-        carDto.setOwnerName(carOwner.getOwnerName());
+        savedCarDto.setOwnerName(carOwner.getOwnerName());
 
-        return carMapper.entityToDto(savedCar);
+        return savedCarDto;
     }
 
     @Override
@@ -91,8 +92,17 @@ public class CarServiceImpl implements CarService {
     public Page<CarDto> getAllCars(Pageable pageable) {
 
         Page<Car> cars = carRepository.findAll(pageable);
+        
+        Page<CarDto> carDtos = cars.map(carMapper::entityToDto);
+        
+        for (CarDto carDto : carDtos) {
+        	CarOwner carOwner = carOwnerRepository.findById(carDto.getOwnerId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
+        	
+        	carDto.setOwnerName(carOwner.getOwnerName());
+		}
 
-        return cars.map(carMapper::entityToDto);
+        return carDtos;
     }
 
     @Override
@@ -133,18 +143,65 @@ public class CarServiceImpl implements CarService {
                 .toList();
     }
 
-    @Override
-    public void uploadImage(String carId, MultipartFile file) throws IOException {
+	@Override
+	public void uploadImage(String carId, List<MultipartFile> imageFiles) throws IOException {
+		
+		Car car = carRepository.findById(carId)
+                .orElseThrow(() -> new RuntimeException("Car not found"));
 
-        Car car = carRepository.findById(carId)
-                .orElseThrow(() -> new ResourceNotFoundException("Car not found"));
+        try {
 
-        if(car.getImages() == null){
-            car.setImages(new ArrayList<>());
+            if (car.getImages() == null) {
+                car.setImages(new ArrayList<>());
+            }
+
+            // max 4 images upload
+            for (MultipartFile file : imageFiles) {
+
+                String fileName = FileService.saveImage(file);
+
+                // save file name in DB
+                car.getImages().add(fileName.getBytes());
+            }
+
+            carRepository.save(car);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Car images upload failed");
         }
+	}
+	
+	@Override
+	public void updateCarImages(String carId, List<MultipartFile> imageFiles) {
 
-        car.getImages().add(file.getBytes());
+	    Car car = carRepository.findById(carId)
+	            .orElseThrow(() -> new RuntimeException("Car not found"));
 
-        carRepository.save(car);
-    }
+	    try {
+
+	        // delete old images from uploads folder
+	        if (car.getImages() != null) {
+	            for (byte[] oldImage : car.getImages()) {
+	                String oldFileName = new String(oldImage);
+	                FileService.deleteImage(oldFileName);
+	            }
+	        }
+
+	        // clear old images from DB
+	        car.setImages(new ArrayList<>());
+
+	        // upload new 4 images
+	        for (MultipartFile file : imageFiles) {
+
+	            String fileName = FileService.saveImage(file);
+
+	            car.getImages().add(fileName.getBytes());
+	        }
+
+	        carRepository.save(car);
+
+	    } catch (Exception e) {
+	        throw new RuntimeException("Car images update failed");
+	    }
+	}
 }

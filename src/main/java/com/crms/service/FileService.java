@@ -12,9 +12,9 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class FileService {
 
-    private final String uploadDir = "uploads/";
+    private final static String uploadDir = "uploads/";
 
-    public String saveImage(MultipartFile file) throws IOException {
+    public static String saveImage(MultipartFile file) throws IOException {
 
         if (file == null || file.isEmpty()) {
             return null;
@@ -44,7 +44,7 @@ public class FileService {
     }
 
     // Delete image
-    public void deleteImage(String fileName) {
+    public static void deleteImage(String fileName) {
         try {
             if (fileName != null) {
                 Path path = Paths.get(uploadDir + fileName);

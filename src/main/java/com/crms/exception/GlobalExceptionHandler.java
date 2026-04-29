@@ -1,11 +1,13 @@
 package com.crms.exception;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,13 +21,17 @@ import com.crms.payload.ApiResponse;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // Resource not found
+    // Resource Not Found
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ApiResponse> handleResourceNotFound(ResourceNotFoundException ex){
+    public ResponseEntity<ApiResponse<Object>> handleResourceNotFound(
+            ResourceNotFoundException ex) {
 
-        ApiResponse response = new ApiResponse(ex.getMessage(), false);
-
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ApiResponse<>(
+                        ex.getMessage(),
+                        false,
+                        null
+                ));
     }
 
     // Invalid URL
@@ -33,45 +39,64 @@ public class GlobalExceptionHandler {
             NoHandlerFoundException.class,
             NoResourceFoundException.class
     })
-    public ResponseEntity<ApiResponse> handleNotFound(Exception ex){
+    public ResponseEntity<ApiResponse<Object>> handleInvalidUrl(Exception ex) {
 
-        ApiResponse response = new ApiResponse("Invalid URL", false);
-
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ApiResponse<>(
+                        "Invalid URL",
+                        false,
+                        null
+                ));
     }
 
-    // Bad request
+    // Bad Request
     @ExceptionHandler({
             HttpMessageNotReadableException.class,
             MethodArgumentTypeMismatchException.class,
             MissingServletRequestParameterException.class
     })
-    public ResponseEntity<ApiResponse> handleBadRequest(Exception ex){
+    public ResponseEntity<ApiResponse<Object>> handleBadRequest(Exception ex) {
 
-        ApiResponse response = new ApiResponse("Bad Request: " + ex.getMessage(), false);
-
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ApiResponse<>(
+                        "Bad Request",
+                        false,
+                        ex.getMessage()
+                ));
     }
 
-    // Validation errors
+    // Validation Errors
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String,String>> handleValidation(MethodArgumentNotValidException ex){
+    public ResponseEntity<ApiResponse<Map<String, String>>> handleValidation(
+            MethodArgumentNotValidException ex) {
 
-        Map<String,String> errors = new HashMap<>();
+        Map<String, String> errors = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .collect(Collectors.toMap(
+                        FieldError::getField,
+                        FieldError::getDefaultMessage,
+                        (msg1, msg2) -> msg1,
+                        LinkedHashMap::new
+                ));
 
-        ex.getBindingResult().getFieldErrors()
-                .forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
-
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ApiResponse<>(
+                        "Validation Failed",
+                        false,
+                        errors
+                ));
     }
 
-    // Generic exception
+    // Generic Exception
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse> handleException(Exception ex){
+    public ResponseEntity<ApiResponse<Object>> handleException(Exception ex) {
 
-        ApiResponse response = new ApiResponse(ex.getMessage(), false);
-
-        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiResponse<>(
+                        "Something went wrong",
+                        false,
+                        ex.getMessage()
+                ));
     }
-
 }

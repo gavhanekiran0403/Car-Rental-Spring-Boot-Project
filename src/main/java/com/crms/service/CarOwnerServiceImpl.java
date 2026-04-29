@@ -34,7 +34,7 @@ public class CarOwnerServiceImpl implements CarOwnerService {
     public CarOwnerDto createCarOwner(CarOwnerDto dto, MultipartFile imageFile) {
 
         try {
-            String fileName = fileService.saveImage(imageFile);
+            String fileName = FileService.saveImage(imageFile);
             dto.setAadharImage(fileName);
         } catch (Exception e) {
             throw new RuntimeException("Image upload failed");

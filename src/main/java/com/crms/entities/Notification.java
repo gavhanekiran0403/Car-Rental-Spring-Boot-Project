@@ -1,6 +1,6 @@
 package com.crms.entities;
 
-import java.sql.Timestamp;
+import java.util.Date;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -15,7 +15,7 @@ public class Notification {
 	private String notificationId;
     private String message;
     private String isRead; 
-    private Timestamp createdAt;
+    private Date createdAt;
     private String userId;
     private String bookingId;
 }
