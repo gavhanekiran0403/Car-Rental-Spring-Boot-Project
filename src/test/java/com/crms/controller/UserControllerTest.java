@@ -70,7 +70,7 @@ public class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userDto)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.fullName").value("Kiran Gavhane"));
+                .andExpect(jsonPath("$.data.fullName").value("Kiran Gavhane"));
     }
 
     @Test
@@ -85,7 +85,7 @@ public class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userDto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.fullName").value("Kiran Gavhane"));
+                .andExpect(jsonPath("$.data.fullName").value("Kiran Gavhane"));
     }
 
     @Test
@@ -97,7 +97,7 @@ public class UserControllerTest {
 
         mockMvc.perform(get("/users/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.fullName").value("Kiran Gavhane"));
+                .andExpect(jsonPath("$.data.fullName").value("Kiran Gavhane"));
     }
 
     @Test
@@ -109,6 +109,6 @@ public class UserControllerTest {
 
         mockMvc.perform(get("/users"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].fullName").value("Kiran Gavhane"));
+                .andExpect(jsonPath("$.data[0].fullName").value("Kiran Gavhane"));
     }
 }
