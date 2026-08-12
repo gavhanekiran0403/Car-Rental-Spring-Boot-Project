@@ -19,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.crms.dto.UserDto;
 import com.crms.entities.User;
@@ -32,6 +33,9 @@ public class UserServiceImplTest {
 
 	@Mock
     private UserRepository userRepository;
+	
+	@Mock
+    private PasswordEncoder passwordEncoder;
 
     @Mock
     private UserMapper userMapper;
@@ -66,32 +70,50 @@ public class UserServiceImplTest {
     
     @Test
     void testRegisterUser() {
-    	
-    	when(userMapper.dtoToEntity(userDto)).thenReturn(user);
-    	when(userRepository.save(any(User.class))).thenReturn(user);
-    	when(userMapper.entityToDto(user)).thenReturn(userDto);
-    	
-    	UserDto savedUserDto = userService.registerUser(userDto);
-    	
-    	assertNotNull(savedUserDto);
-    	assertEquals("Kiran Gavhane", savedUserDto.getFullName());
-    	
-    	verify(userRepository).save(any(User.class));
+
+        when(userMapper.dtoToEntity(userDto)).thenReturn(user);
+
+        when(passwordEncoder.encode("kiran@123"))
+                .thenReturn("encodedPassword");
+
+        when(userRepository.save(any(User.class)))
+                .thenReturn(user);
+
+        when(userMapper.entityToDto(user))
+                .thenReturn(userDto);
+
+        UserDto savedUserDto = userService.registerUser(userDto);
+
+        assertNotNull(savedUserDto);
+        assertEquals("Kiran Gavhane", savedUserDto.getFullName());
+
+        verify(passwordEncoder).encode("kiran@123");
+        verify(userRepository).save(any(User.class));
     }
     
     @Test
     void testUpdateUser() {
-    	
-    	when(userRepository.findById("1")).thenReturn(Optional.of(user));
-    	when(userRepository.save(any(User.class))).thenReturn(user);
-    	when(userMapper.entityToDto(user)).thenReturn(userDto);
-    	
-    	UserDto updatedUserDto = userService.updateUser("1", userDto);
-    	
-    	assertNotNull(updatedUserDto);
-    	assertEquals("Kiran Gavhane", updatedUserDto.getFullName());
-    	
-    	verify(userRepository).save(user);
+
+        when(userRepository.findById("1"))
+                .thenReturn(Optional.of(user));
+
+        when(passwordEncoder.encode("kiran@123"))
+                .thenReturn("encodedPassword");
+
+        when(userRepository.save(any(User.class)))
+                .thenReturn(user);
+
+        when(userMapper.entityToDto(user))
+                .thenReturn(userDto);
+
+        UserDto updatedUserDto =
+                userService.updateUser("1", userDto);
+
+        assertNotNull(updatedUserDto);
+        assertEquals("Kiran Gavhane", updatedUserDto.getFullName());
+
+        verify(passwordEncoder).encode("kiran@123");
+        verify(userRepository).save(user);
     }
     
     @Test
