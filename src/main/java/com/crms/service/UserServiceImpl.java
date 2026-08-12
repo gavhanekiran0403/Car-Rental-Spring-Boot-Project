@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.crms.dto.UserDto;
@@ -22,9 +23,17 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private UserMapper userMapper;
 	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+	
 	@Override
 	public UserDto registerUser(UserDto userDto) {
 		User user = userMapper.dtoToEntity(userDto);
+		user.setPassword(
+	            passwordEncoder.encode(
+	                    userDto.getPassword()
+	            )
+	    );
 		user.setRole(Role.USER);
 		user.setStatus(false);
 		User savedUser = userRepository.save(user);
@@ -38,7 +47,8 @@ public class UserServiceImpl implements UserService {
 		user.setFullName(userDto.getFullName());
 		user.setPhoneNo(userDto.getPhoneNo());
 		user.setEmail(userDto.getEmail());
-		user.setPassword(userDto.getPassword());
+		user.setPassword(passwordEncoder.encode(
+                userDto.getPassword()));
 
 		User updatedUser = userRepository.save(user);
 		return userMapper.entityToDto(updatedUser);

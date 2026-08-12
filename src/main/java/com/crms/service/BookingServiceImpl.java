@@ -14,6 +14,8 @@ import com.crms.dto.BookingDto;
 import com.crms.dto.NotificationDto;
 import com.crms.entities.Booking;
 import com.crms.entities.Notification;
+import com.crms.kafka.BookingEvent;
+import com.crms.kafka.BookingProducer;
 import com.crms.mapper.BookingMapper;
 import com.crms.repository.BookingRepository;
 import com.crms.repository.NotificationRepository;
@@ -35,45 +37,44 @@ public class BookingServiceImpl implements BookingService {
     
     @Autowired
     private NotificationRepository notificationRepository;
+    
+    @Autowired
+    private BookingProducer bookingProducer;
 
     @Override
     public BookingDto createBooking(BookingDto dto, MultipartFile file) {
 
         Booking booking = mapper.dtoToEntity(dto);
-        
-        try {
-			String fileName = FileService.saveImage(file);
-			booking.setAadharCard(fileName);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 
-        // Set created time automatically
+        try {
+            String fileName = FileService.saveImage(file);
+            booking.setAadharCard(fileName);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         booking.setCreatedAt(new Date());
 
-        // Default status
         if (booking.getStatus() == null) {
             booking.setStatus("PENDING");
         }
 
+        // Save booking
         Booking saved = repository.save(booking);
-        
-        NotificationDto notificationDto = new NotificationDto();
-        
-        notificationDto.setMessage(
-                "New booking created successfully. Booking ID : " + saved.getBookingId());
 
-        notificationDto.setIsRead("NO");
+        // Create Kafka Event
+        BookingEvent event = new BookingEvent(
+                saved.getBookingId(),
+                saved.getUserId(),
+                saved.getCarId(),
+                saved.getStatus(),
+                saved.getTotalAmount()
+        );
 
-        notificationDto.setCreatedAt(new Date());
+        // Publish event
+        bookingProducer.sendBookingEvent(event);
 
-        // send notification to user who booked
-        notificationDto.setUserId(saved.getUserId());
-
-        notificationDto.setBookingId(saved.getBookingId());
-        
-        notificationService.createNotification(notificationDto);
-        
         return mapper.entityToDto(saved);
     }
 
